@@ -1,0 +1,4 @@
+/home/meraxes/git/trees-generator/build/CMakeFiles/edit_cache.dir
+/home/meraxes/git/trees-generator/build/CMakeFiles/yocto_gl.dir
+/home/meraxes/git/trees-generator/build/CMakeFiles/rebuild_cache.dir
+/home/meraxes/git/trees-generator/build/CMakeFiles/tree_generator.dir

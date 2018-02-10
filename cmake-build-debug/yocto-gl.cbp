@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="yocto-gl"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/meraxes/git/trees-generator/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/meraxes/git/trees-generator/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="tree_generator">
+				<Option output="/home/meraxes/git/trees-generator/bin/tree_generator" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/meraxes/git/trees-generator/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DYGL_OPENGL=1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 tree_generator"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="tree_generator/fast">
+				<Option output="/home/meraxes/git/trees-generator/bin/tree_generator" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/meraxes/git/trees-generator/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DYGL_OPENGL=1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 tree_generator/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/meraxes/git/trees-generator/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="yocto_gl">
+				<Option output="/home/meraxes/git/trees-generator/bin/libyocto_gl.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/meraxes/git/trees-generator/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DYGL_OPENGL=1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 yocto_gl"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="yocto_gl/fast">
+				<Option output="/home/meraxes/git/trees-generator/bin/libyocto_gl.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/meraxes/git/trees-generator/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DYGL_OPENGL=1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 yocto_gl/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/meraxes/git/trees-generator/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/meraxes/git/trees-generator/tree_generator.cpp">
+			<Option target="tree_generator"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/ext/imgui/imgui.cpp">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/ext/imgui/imgui.h">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/ext/imgui/imgui_draw.cpp">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/ext/imgui/imgui_extra_fonts.cpp">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.cpp">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.h">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/ext/nanosvg.cpp">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/ext/nanosvg.h">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/ext/stb_image.cpp">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/ext/stb_image.h">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/yocto_gl.cpp">
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/yocto-gl/yocto/yocto_gl.h">
+			<Option target="tree_generator"/>
+			<Option target="yocto_gl"/>
+		</Unit>
+		<Unit filename="/home/meraxes/git/trees-generator/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
