@@ -60,7 +60,6 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(yocto_gl Threads::Threads)
 endif(UNIX AND NOT APPLE)
 
-
 add_executable(tree_generator tree_generator.cpp yocto-gl/yocto/yocto_gl.h)
 
 target_link_libraries(tree_generator yocto_gl)
