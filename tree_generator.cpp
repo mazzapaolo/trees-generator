@@ -1,7 +1,55 @@
 #include "yocto-gl/yocto/yocto_gl.h"
+#include "yocto-gl/yocto/yocto_gl.cpp"
 
 using namespace ygl;
 using namespace std;
+
+material* make_material(const std::string& name, const vec3f& kd,
+                        const std::string& kd_txt, const vec3f& ks = {0.04f, 0.04f, 0.04f},
+                        float rs = 0.01f) {
+    auto* mt = new material;
+    mt->name = name;
+    mt->kd = kd;
+    mt->ks = ks;
+    mt->rs = rs;
+    mt->kd_txt =  new texture;
+    mt->kd_txt->path = kd_txt;
+    return mt;
+}
+
+void refine_branch_fork(int c, vec3f node, float r, material* mat, shape_group* shp_group) {
+
+    auto shp = new shape{to_string(c+20000)};
+    shp_group->shapes.push_back(shp);
+    auto usteps = 32;
+    auto vsteps = 16;
+    for(auto m = 0; m < vsteps; m++) {
+        for (auto n = 0; n < usteps; n++) {
+            int i = (usteps+1)*m + n;
+            int j = i+usteps+1;
+            shp->quads.push_back(vec4i{i,i+1,j+1, j});
+        }
+    }
+    for (auto i = 0; i <= vsteps; i++) {
+        for (auto j = 0; j <= usteps; j++) {
+            auto u = j/float(usteps);
+            auto v = i/float(vsteps);
+            //printf("%f, %f\n", u, v);
+            shp->texcoord.push_back(vec2f{u,v});
+        }
+    }
+    auto frame = make_frame_fromz(node, vec3f{0.0f,1.0f,0.0f});
+
+    for (auto uv : shp->texcoord) {
+        auto uu = float(2*M_PI*uv.x);
+        auto vv = float(M_PI*(1-uv.y));
+        auto point = transform_point(frame, vec3f{r*sin(vv)*cos(uu), r*sin(vv)*sin(uu), r*cos(vv)});
+        shp->pos.push_back(point);
+
+    }
+    compute_normals(shp);
+    shp->mat = mat;
+}
 
 void generate_attraction_points(int n, vector<vec3f> pos, vector<vec3f>* points) {
     auto ps = n/(pos.size()/2) +1;
@@ -10,15 +58,16 @@ void generate_attraction_points(int n, vector<vec3f> pos, vector<vec3f>* points)
     rng_pcg32 rang;
     seed_rng(rang, time(NULL));
     int j = 0;
-
-    while (i < pos.size()/2  and points->size() <= n) {
+    int counter = 0;
+    while (i < pos.size()/2  and counter <= n) {
         auto f1 = next_rand1i(rang, pos.size());
         auto f2 = next_rand1i(rang, pos.size());
-        while(j < ps and points->size() < n) {
+        while(j < ps and counter < n) {
             auto f3 = next_rand1f(rang, ygl::min(pos.at(f1).x, pos.at(f2).x), ygl::max(pos.at(f1).x, pos.at(f2).x));
             auto f4 = next_rand1f(rang, ygl::min(pos.at(f1).y, pos.at(f2).y), ygl::max(pos.at(f1).y, pos.at(f2).y));
             auto f5 = next_rand1f(rang, ygl::min(pos.at(f1).z, pos.at(f2).z), ygl::max(pos.at(f1).z, pos.at(f2).z));
             points->push_back(vec3f{f3,f4,f5});
+            counter++;
             j++;
         }
         i++;
@@ -26,18 +75,18 @@ void generate_attraction_points(int n, vector<vec3f> pos, vector<vec3f>* points)
     }
 }
 
-float build_branch_rec(float n, int c, float r, vector<vec3f>* nodes, scene* scn, vector<vector<int>>* children,
-                        vector<int>* parent, vector<vec3f>* norm) {
+float build_branch_rec(float n, int c, float r, vector<vec3f>* nodes, vector<vector<int>>* children,
+                        vector<int>* parent, vector<vec3f>* norm, material* mat, shape_group* shp_group) {
     float ray = 0.0f;
     for (auto i = 0; i < children->at(c).size(); i++) {
-        ray += pow(build_branch_rec(n, children->at(c).at(i), r, nodes, scn, children, parent, norm),n);
+        ray += pow(build_branch_rec(n, children->at(c).at(i), r, nodes, children, parent, norm, mat, shp_group),n);
     }
 
     if (ray == 0.0f) { ray = r; }
     else { ray = pow(ray, 1.0f/n); }
     auto i = 0.0f;
     if (parent->at(c) != c) {
-        auto shp_group = new shape_group;
+        refine_branch_fork(c, nodes->at(c), ray, mat, shp_group);
         auto shp = new shape{to_string(c)};
         shp_group->shapes.push_back(shp);
 
@@ -45,7 +94,8 @@ float build_branch_rec(float n, int c, float r, vector<vec3f>* nodes, scene* scn
         auto frame_parent = make_frame_fromz(nodes->at(parent->at(c)), norm->at(c));
         float d_x = cos(i)*ray;
         float d_y = sin(i)*ray;
-        auto first_point = vec3f{d_x, 0.0f, d_y};
+
+        auto first_point = vec3f{d_x, d_y, 0.0f};
         auto first_child = transform_point(frame_child, first_point);
         auto first_parent = transform_point(frame_parent, first_point);
 
@@ -54,6 +104,7 @@ float build_branch_rec(float n, int c, float r, vector<vec3f>* nodes, scene* scn
         auto second_child = vec3f{0.0f, 0.0f, 0.0f};
         auto second_parent = vec3f{0.0f, 0.0f, 0.0f};
         auto count = 0;
+        i = 6.28f/360.0f;
         while (i < 6.28f) {
             auto c_x = cos(i)*ray;
             auto c_y = sin(i)*ray;
@@ -66,30 +117,24 @@ float build_branch_rec(float n, int c, float r, vector<vec3f>* nodes, scene* scn
             shp->norm.push_back(triangle_normal(shp->pos.at(count),shp->pos.at(count+1),shp->pos.at(count+2)));
             shp->triangles.push_back(vec3i{count+1, count+2, count+3});
             shp->norm.push_back(triangle_normal(shp->pos.at(count+1),shp->pos.at(count+2),shp->pos.at(count+3)));
+
+
+
             count += 2;
-            i += 6.28f/60.0f;
+            i += 6.28f/360.0f;
         }
         shp->triangles.push_back(vec3i{0,1,count});
         shp->norm.push_back(triangle_normal(shp->pos.at(0),shp->pos.at(1),shp->pos.at(count)));
         shp->triangles.push_back(vec3i{1,count,count+1});
         shp->norm.push_back(triangle_normal(shp->pos.at(1),shp->pos.at(count),shp->pos.at(count+1)));
-        auto inst = new instance();
-        inst->name = to_string(c);
-        inst->shp = shp_group;
-        scn->instances.push_back(inst);
-        scn->shapes.push_back(shp_group);
+        shp->mat = mat;
     }
     return ray;
 }
 
-void build_branches(float n, int c, float r, vector<vec3f>* nodes, scene* scn,
-                    vector<vector<int>>* children, vector<int>* parent, vector<vec3f>* norm) {
-    build_branch_rec(n, c, r, nodes, scn, children, parent, norm);
-}
-
-obj_mesh* load_envelope(const string &filename) {
-    auto obj_envelope = load_obj(filename);
-    return get_mesh(obj_envelope, *obj_envelope->objects[0], true);
+void build_branches(float n, int c, float r, vector<vec3f>* nodes,
+                    vector<vector<int>>* children, vector<int>* parent, vector<vec3f>* norm, material* mat, shape_group* shp_group) {
+    build_branch_rec(n, c, r, nodes, children, parent, norm, mat, shp_group);
 }
 
 void generate_nodes(float Di, float D, float Dk, vector<vec3f>* att_points, vector<vec3f>* nodes, vector<vector<int>>* children,
@@ -99,7 +144,6 @@ void generate_nodes(float Di, float D, float Dk, vector<vec3f>* att_points, vect
     float node_point_distance = -1.0f;
 
     while (flag) {
-        printf("%lu %lu\n", nodes->size(), att_points->size());
         flag = false;
         min_dist = -1.0f;
         int closest [att_points->size()] = {0};
@@ -146,49 +190,79 @@ void generate_nodes(float Di, float D, float Dk, vector<vec3f>* att_points, vect
 }
 
 void add_base_node(vec3f node, vec3f norm, vector<vec3f>* nodes, vector<vector<int>>* children,
-        vector<int>* parents, vector<vec3f>* nodes_norms) {
+        vector<int>* parents, vector<vec3f>* nodes_norms, vector<int>* base_nodes, int parent, int child, bool is_base) {
     nodes->push_back(node);
     nodes_norms->push_back(norm);
     vector<int> row;
     children->push_back(row);
-    parents->push_back(int(nodes->size())-1);
-
+    if (child != -1) {
+        children->at(int(nodes->size())-1).push_back(child);
+    }
+    if (is_base) {
+        base_nodes->push_back(parent);
+    }
+    parents->push_back(parent);
 }
 
 int main(int argc, char * argv []) {
-    auto envelope = load_envelope("untitled.obj");
-    auto obj_envelope = load_obj("untitled.obj");
-    float D = 0.1f;        // distance between adjacent nodes
-    auto N = 12000;          // number of attraction points
-    auto Di = 8.0f*D;         // radius of influence
-    auto Dk = 5.0f*D;         // kill distance
+    auto opts_in = new load_options;
+    auto envelope = load_obj_scene("untitled.obj", *opts_in);
+    float D = 0.06f;        // distance between adjacent nodes
+    auto N = 3000;         // number of attraction points
+    auto Di = 7.0f*D;       // radius of influence
+    auto Dk = 4.0f*D;       // kill distance
 
     auto att_points = new vector<vec3f>();
 
-    generate_attraction_points(N, envelope->shapes[0].pos, att_points);
-    generate_attraction_points(N, obj_envelope->objects[0]->groups[0]->verts, att_points);
-    printf("att_points\n");
+    for(auto* env_shp : envelope->shapes) {
+        print("1\n");
+        generate_attraction_points(N, env_shp->shapes[0]->pos, att_points);
+        printf("%d\n", att_points->size());
+    }
 
     auto nodes = new vector<vec3f>();
     auto nodes_norms = new vector<vec3f>();
     auto parents = new vector<int>();
+    auto base_nodes = new vector<int>();
     auto children = new vector<vector<int>>();
 
-    add_base_node(vec3f{0.0f, 0.0f, 0.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms);
+    add_base_node(vec3f{-2.0f, 0.0f, -5.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 0, 1, true);
+    add_base_node(vec3f{-2.0f, 0.1f, -5.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 0, -1, false);
+
+    add_base_node(vec3f{-5.0f, 0.0f, 3.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 2, 3, true);
+    add_base_node(vec3f{-5.0f, 0.1f, 3.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 2, -1, false);
+
+    add_base_node(vec3f{0.0f, 0.0f, 0.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 4, 5, true);
+    add_base_node(vec3f{0.0f, 0.1f, 0.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 4, -1, false);
+
     generate_nodes(Di, D, Dk, att_points, nodes, children, parents, nodes_norms);
 
-    printf("nodes! %lu\n\n", nodes->size());
+    printf("nodes = %lu\n", nodes->size());
 
-    auto scn_out = new scene();
-    auto opts_out = new save_options;
     float r = 0.004f;
     float n = 2.5f;
-    build_branches(n, 0, r, nodes, scn_out, children, parents, nodes_norms);
-    printf("branches\n\n");
 
-    printf("shapes = %lu\n", scn_out->shapes.size());
-    save_scene("out1.obj", scn_out, *opts_out);
-    delete scn_out;
+    auto scn_out = new scene();
+
+    auto bark = make_material("bark", vec3f{1, 1, 1}, "bark.jpg");
+    scn_out->textures.push_back(bark->kd_txt);
+    scn_out->materials.push_back(bark);
+
+    for (auto i : *base_nodes) {
+        printf("%d\n", i);
+        auto shp_group = new shape_group;
+        build_branches(n, i, r, nodes, children, parents, nodes_norms, bark, shp_group);
+        auto* inst = new instance;
+        inst->name = to_string(20000+i);
+        inst->shp = shp_group;
+        inst->frame = make_frame_fromz(vec3f{-1.25f, 1, 0}, vec3f{0, 0, 1});
+        scn_out->instances.push_back(inst);
+        scn_out->shapes.push_back(shp_group);
+    }
+
+    auto opts_out = new save_options;
+    save_scene("out.obj", scn_out, *opts_out);
+    //delete scn_out;
 
     return 0;
 }

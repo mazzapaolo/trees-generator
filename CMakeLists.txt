@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.5)
 
-project (yocto-gl)
+project (trees-generator)
 
 option(YOCTO_OPENGL "Build OpenGL apps" ON)
 option(YOCTO_EXPERIMENTAL "Build experimental apps" OFF)

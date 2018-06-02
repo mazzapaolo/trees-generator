@@ -1,1 +1,1 @@
-/usr/bin/c++  -g   CMakeFiles/tree_generator.dir/tree_generator.cpp.o  -o bin/tree_generator bin/libyocto_gl.a /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libglfw.so /usr/lib/x86_64-linux-gnu/libGLEW.so -lpthread 
+/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/tree_generator.dir/tree_generator.cpp.o  -o bin/tree_generator bin/libyocto_gl.a /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libglfw.so /usr/lib/x86_64-linux-gnu/libGLEW.so -lpthread 
