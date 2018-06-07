@@ -78,6 +78,21 @@ void generate_base_nodes(vector<vec3f>* att_points, vector<tree_node *>* nodes, 
     }
 }
 
+void add_base_node(vec3f node, vec3f norm, vector<vec3f>* nodes, vector<vector<int>>* children,
+                   vector<int>* parents, vector<vec3f>* nodes_norms, vector<int>* base_nodes, int parent, int child, bool is_base) {
+    nodes->push_back(node);
+    nodes_norms->push_back(norm);
+    vector<int> row;
+    children->push_back(row);
+    if (child != -1) {
+        children->at(int(nodes->size())-1).push_back(child);
+    }
+    if (is_base) {
+        base_nodes->push_back(parent);
+    }
+    parents->push_back(parent);
+}
+
 /// TO-FIX replacing the vectors of parameters for the nodes with a vector of tree_node
 /// TO-ADD the direction of the growth can be biased by a vector representing a combined effect of branch weight and
 /// tropisms
@@ -171,6 +186,13 @@ material* make_material(const std::string& name, const vec3f& kd,
     return mt;
 }
 
+///
+/// \param c
+/// \param node
+/// \param r
+/// \param mat
+/// \param shp_group
+
 void refine_branch_fork(int c, vec3f node, float r, material* mat, shape_group* shp_group) {
 
     auto shp = new shape{to_string(c+20000)};
@@ -203,11 +225,23 @@ void refine_branch_fork(int c, vec3f node, float r, material* mat, shape_group* 
     shp->mat = mat;
 }
 
-float build_branch_rec(float n, int c, float r, vector<vec3f>* nodes, vector<vector<int>>* children,
-                        vector<int>* parent, vector<vec3f>* norm, material* mat, shape_group* shp_group) {
+///
+/// \param n
+/// \param c
+/// \param r
+/// \param nodes
+/// \param children
+/// \param parent
+/// \param norm
+/// \param mat
+/// \param shp_group
+/// \return
+
+float build_branch(float n, int c, float r, vector<vec3f> *nodes, vector<vector<int>> *children,
+                   vector<int> *parent, vector<vec3f> *norm, material *mat, shape_group *shp_group) {
     float ray = 0.0f;
     for (auto i = 0; i < children->at(c).size(); i++) {
-        ray += pow(build_branch_rec(n, children->at(c).at(i), r, nodes, children, parent, norm, mat, shp_group),n);
+        ray += pow(build_branch(n, children->at(c).at(i), r, nodes, children, parent, norm, mat, shp_group),n);
     }
 
     if (ray == 0.0f) { ray = r; }
@@ -259,22 +293,7 @@ float build_branch_rec(float n, int c, float r, vector<vec3f>* nodes, vector<vec
 
 void build_branches(float n, int c, float r, vector<vec3f>* nodes,
                     vector<vector<int>>* children, vector<int>* parent, vector<vec3f>* norm, material* mat, shape_group* shp_group) {
-    build_branch_rec(n, c, r, nodes, children, parent, norm, mat, shp_group);
-}
-
-void add_base_node(vec3f node, vec3f norm, vector<vec3f>* nodes, vector<vector<int>>* children,
-        vector<int>* parents, vector<vec3f>* nodes_norms, vector<int>* base_nodes, int parent, int child, bool is_base) {
-    nodes->push_back(node);
-    nodes_norms->push_back(norm);
-    vector<int> row;
-    children->push_back(row);
-    if (child != -1) {
-        children->at(int(nodes->size())-1).push_back(child);
-    }
-    if (is_base) {
-        base_nodes->push_back(parent);
-    }
-    parents->push_back(parent);
+    build_branch(n, c, r, nodes, children, parent, norm, mat, shp_group);
 }
 
 int main(int argc, char * argv []) {
