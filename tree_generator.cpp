@@ -4,6 +4,35 @@
 using namespace ygl;
 using namespace std;
 
+/// given a vector of points, generate a random distribution of n attraction points inside the convex hull of the points
+/// \param n
+/// \param pos
+/// \param points
+void generate_attraction_points(int n, vector<vec3f> pos, vector<vec3f>* points) {
+    auto ps = n/(pos.size()/2) +1;
+    int i = 0;
+    init_rng(time(NULL));
+    rng_pcg32 rang;
+    seed_rng(rang, time(NULL));
+    int j = 0;
+    int counter = 0;
+    while (i < pos.size()/2  and counter <= n) {
+        auto f1 = next_rand1i(rang, pos.size());
+        auto f2 = next_rand1i(rang, pos.size());
+        while(j < ps and counter < n) {
+            auto f3 = next_rand1f(rang, ygl::min(pos.at(f1).x, pos.at(f2).x), ygl::max(pos.at(f1).x, pos.at(f2).x));
+            auto f4 = next_rand1f(rang, ygl::min(pos.at(f1).y, pos.at(f2).y), ygl::max(pos.at(f1).y, pos.at(f2).y));
+            auto f5 = next_rand1f(rang, ygl::min(pos.at(f1).z, pos.at(f2).z), ygl::max(pos.at(f1).z, pos.at(f2).z));
+            points->push_back(vec3f{f3,f4,f5});
+            counter++;
+            j++;
+        }
+        i++;
+        j = 0;
+    }
+}
+
+
 material* make_material(const std::string& name, const vec3f& kd,
                         const std::string& kd_txt, const vec3f& ks = {0.04f, 0.04f, 0.04f},
                         float rs = 0.01f) {
@@ -34,7 +63,6 @@ void refine_branch_fork(int c, vec3f node, float r, material* mat, shape_group* 
         for (auto j = 0; j <= usteps; j++) {
             auto u = j/float(usteps);
             auto v = i/float(vsteps);
-            //printf("%f, %f\n", u, v);
             shp->texcoord.push_back(vec2f{u,v});
         }
     }
@@ -45,35 +73,12 @@ void refine_branch_fork(int c, vec3f node, float r, material* mat, shape_group* 
         auto vv = float(M_PI*(1-uv.y));
         auto point = transform_point(frame, vec3f{r*sin(vv)*cos(uu), r*sin(vv)*sin(uu), r*cos(vv)});
         shp->pos.push_back(point);
-
     }
     compute_normals(shp);
     shp->mat = mat;
 }
 
-void generate_attraction_points(int n, vector<vec3f> pos, vector<vec3f>* points) {
-    auto ps = n/(pos.size()/2) +1;
-    int i = 0;
-    init_rng(time(NULL));
-    rng_pcg32 rang;
-    seed_rng(rang, time(NULL));
-    int j = 0;
-    int counter = 0;
-    while (i < pos.size()/2  and counter <= n) {
-        auto f1 = next_rand1i(rang, pos.size());
-        auto f2 = next_rand1i(rang, pos.size());
-        while(j < ps and counter < n) {
-            auto f3 = next_rand1f(rang, ygl::min(pos.at(f1).x, pos.at(f2).x), ygl::max(pos.at(f1).x, pos.at(f2).x));
-            auto f4 = next_rand1f(rang, ygl::min(pos.at(f1).y, pos.at(f2).y), ygl::max(pos.at(f1).y, pos.at(f2).y));
-            auto f5 = next_rand1f(rang, ygl::min(pos.at(f1).z, pos.at(f2).z), ygl::max(pos.at(f1).z, pos.at(f2).z));
-            points->push_back(vec3f{f3,f4,f5});
-            counter++;
-            j++;
-        }
-        i++;
-        j = 0;
-    }
-}
+
 
 float build_branch_rec(float n, int c, float r, vector<vec3f>* nodes, vector<vector<int>>* children,
                         vector<int>* parent, vector<vec3f>* norm, material* mat, shape_group* shp_group) {
@@ -117,9 +122,6 @@ float build_branch_rec(float n, int c, float r, vector<vec3f>* nodes, vector<vec
             shp->norm.push_back(triangle_normal(shp->pos.at(count),shp->pos.at(count+1),shp->pos.at(count+2)));
             shp->triangles.push_back(vec3i{count+1, count+2, count+3});
             shp->norm.push_back(triangle_normal(shp->pos.at(count+1),shp->pos.at(count+2),shp->pos.at(count+3)));
-
-
-
             count += 2;
             i += 6.28f/360.0f;
         }
@@ -205,19 +207,21 @@ void add_base_node(vec3f node, vec3f norm, vector<vec3f>* nodes, vector<vector<i
 }
 
 int main(int argc, char * argv []) {
+    auto parser = make_parser(argc, argv, "trees-generator", "create tree");
+    auto env = parse_opt<string>(parser, "--envelope", "-e", "filename of the envelope", "empty", true);
+    auto N = parse_opt<int>(parser, "--points", "-p", "number of attraction points", 1000);
+    auto D = parse_opt<float>(parser, "--distance", "-d", "distance between adjacent nodes", 0.06f, true);
+    auto Di = parse_opt<float>(parser, "--influence", "-i", "radius of influence", 7.0f, true)*D;
+    auto Dk = parse_opt<float>(parser, "--kill", "-k", "kill distance", 4.0f, true)*D;
+    auto output = parse_opt<string>(parser, "--output", "-o", "output filename", "out.obj", true);
+
     auto opts_in = new load_options;
-    auto envelope = load_obj_scene("untitled.obj", *opts_in);
-    float D = 0.06f;        // distance between adjacent nodes
-    auto N = 3000;         // number of attraction points
-    auto Di = 7.0f*D;       // radius of influence
-    auto Dk = 4.0f*D;       // kill distance
+    auto envelope = load_obj_scene(env, *opts_in);
 
     auto att_points = new vector<vec3f>();
 
     for(auto* env_shp : envelope->shapes) {
-        print("1\n");
         generate_attraction_points(N, env_shp->shapes[0]->pos, att_points);
-        printf("%d\n", att_points->size());
     }
 
     auto nodes = new vector<vec3f>();
@@ -226,14 +230,8 @@ int main(int argc, char * argv []) {
     auto base_nodes = new vector<int>();
     auto children = new vector<vector<int>>();
 
-    add_base_node(vec3f{-2.0f, 0.0f, -5.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 0, 1, true);
-    add_base_node(vec3f{-2.0f, 0.1f, -5.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 0, -1, false);
-
-    add_base_node(vec3f{-5.0f, 0.0f, 3.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 2, 3, true);
-    add_base_node(vec3f{-5.0f, 0.1f, 3.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 2, -1, false);
-
-    add_base_node(vec3f{0.0f, 0.0f, 0.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 4, 5, true);
-    add_base_node(vec3f{0.0f, 0.1f, 0.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 4, -1, false);
+    add_base_node(vec3f{0.0f, 0.0f, 0.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 0, 1, true);
+    add_base_node(vec3f{0.0f, 0.1f, 0.0f}, vec3f{0.0f,1.0f,0.0f}, nodes, children, parents, nodes_norms, base_nodes, 0, -1, false);
 
     generate_nodes(Di, D, Dk, att_points, nodes, children, parents, nodes_norms);
 
@@ -261,7 +259,7 @@ int main(int argc, char * argv []) {
     }
 
     auto opts_out = new save_options;
-    save_scene("out.obj", scn_out, *opts_out);
+    save_scene(output, scn_out, *opts_out);
     //delete scn_out;
 
     return 0;
