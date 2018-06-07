@@ -4,34 +4,159 @@
 using namespace ygl;
 using namespace std;
 
+struct tree_node {
+    vec3f pos;
+    vec3f norm;
+    vector<tree_node *> *children;
+    tree_node *parent;
+
+    tree_node(vec3f pos, vec3f norm) {
+        this->pos = pos;
+        this->norm = norm;
+        this->parent = this;
+        children = new vector<tree_node*>();
+    }
+
+    void set_parent(tree_node* parent) {
+        this->parent = parent;
+    }
+
+    void add_child(tree_node* child) {
+        children->push_back(child);
+    }
+};
+
 /// given a vector of points, generate a random distribution of n attraction points inside the convex hull of the points
 /// \param n
 /// \param pos
 /// \param points
 void generate_attraction_points(int n, vector<vec3f> pos, vector<vec3f>* points) {
     auto ps = n/(pos.size()/2) +1;
-    int i = 0;
     init_rng(time(NULL));
     rng_pcg32 rang;
     seed_rng(rang, time(NULL));
-    int j = 0;
+
     int counter = 0;
-    while (i < pos.size()/2  and counter <= n) {
+    for(auto i = 0; i < pos.size()/2 and counter <= n; i++) {
         auto f1 = next_rand1i(rang, pos.size());
         auto f2 = next_rand1i(rang, pos.size());
-        while(j < ps and counter < n) {
+        for (auto j = 0; j < ps and counter <= n; j++) {
             auto f3 = next_rand1f(rang, ygl::min(pos.at(f1).x, pos.at(f2).x), ygl::max(pos.at(f1).x, pos.at(f2).x));
             auto f4 = next_rand1f(rang, ygl::min(pos.at(f1).y, pos.at(f2).y), ygl::max(pos.at(f1).y, pos.at(f2).y));
             auto f5 = next_rand1f(rang, ygl::min(pos.at(f1).z, pos.at(f2).z), ygl::max(pos.at(f1).z, pos.at(f2).z));
             points->push_back(vec3f{f3,f4,f5});
             counter++;
-            j++;
         }
-        i++;
-        j = 0;
     }
 }
 
+/// TO-CHECK given the set of attraction points, generates base nodes for the tree
+/// \param att_points
+/// \param nodes
+/// \param influence
+/// \param distance
+
+void generate_base_nodes(vector<vec3f>* att_points, vector<tree_node *>* nodes, float influence, float distance) {
+    auto min = -1.0f;
+    auto lowest = vec3f{0.0f, 0.0f, 0.0f};
+
+    for (auto point : *att_points) {
+        if ((min == -1.0 or min <  point.y) and point.y >= 0) {
+            min = point.y;
+            lowest = point;
+        }
+    }
+    auto base = new tree_node{vec3f{lowest.x, 0.0f, lowest.z}, vec3f{0.0f,1.0f,0.0f}};
+    base->parent = base;
+    nodes->push_back(base);
+    auto base_y = 0.0f;
+    while (base_y < lowest.y - influence) {
+        auto new_node = new tree_node(vec3f{lowest.x, base_y+distance, lowest.z}, vec3f{0.0f,1.0f,0.0f});
+        new_node->parent = nodes->back();
+        nodes->push_back(new_node);
+        base_y += distance;
+    }
+}
+
+/// TO-FIX replacing the vectors of parameters for the nodes with a vector of tree_node
+/// TO-ADD the direction of the growth can be biased by a vector representing a combined effect of branch weight and
+/// tropisms
+/// bulk of the space colonization algorithm, in each iteration of the outer while it adds new nodes:
+///     - an attraction point may influence the tree node that is closest to it. This influence occurs if the distance
+///       between the point and the closest node is less then the radius of influence Di
+///     - there may be several attraction points that influence a single tree node v
+///       the first inner "for" calculates for each node the set of its attraction points and sums over this set the
+///       difference between the attraction point and the node, all normalized
+///     - in the last inner "for", it calculates the position of the new node, using the formula
+///       new_node = node + normalize(direction)*D, with D equals the distance between two adjacent nodes
+///     - after a new node is added, it verifies if it is inside the kill distance of any remaining attraction point,
+///       if it is, then the attraction point is removed
+/// \param Di
+/// \param D
+/// \param Dk
+/// \param att_points
+/// \param nodes
+/// \param children
+/// \param parents
+/// \param nodes_norms
+void generate_nodes(float Di, float D, float Dk, vector<vec3f>* att_points,
+                    vector<vec3f>* nodes, vector<vector<int>>* children, vector<int>* parents, vector<vec3f>* nodes_norms) {
+    float min_dist;
+    auto flag = true;
+    float node_point_distance = -1.0f;
+
+    while (flag) {
+        flag = false;
+        min_dist = -1.0f;
+        int closest [att_points->size()] = {0};
+        vec3f new_nodes [nodes->size()];
+
+        /*
+         * vector of directions for each new node of the current iteration
+         */
+        for (auto i = 0; i < att_points->size(); i++) {
+            for (auto j = 0; j < nodes->size(); j++) {
+                if (overlap_point(att_points->at(i), Di, nodes->at(j), 0.0f, node_point_distance)) {
+                    if (min_dist < 0 or node_point_distance < min_dist) {
+                        closest[i] = j+1;
+                        min_dist = node_point_distance;
+                    }
+                }
+            }
+            if (closest[i] > 0) {
+                new_nodes[closest[i]-1] += normalize(att_points->at(i) - nodes->at(closest[i]-1));
+            }
+        }
+
+        /*
+         * for each node generates a new node, if any, and removes the attraction points
+         */
+
+        auto len_nodes_old = nodes->size();
+        int n = 0;
+        for (auto i = 0; i< len_nodes_old; i++) {
+            auto novo = nodes->at(i) + D*normalize(new_nodes[i]);
+            if (new_nodes[i] != vec3f{0.0f, 0.0f, 0.0f} and find(nodes->begin(), nodes->end(), novo) == nodes->end()) {
+                flag = true;
+                parents->push_back(i);
+                vector<int> row;
+                children->push_back(row);
+                nodes->push_back(novo);
+                nodes_norms->push_back(normalize(new_nodes[i]));
+                children->at(i).push_back(int(nodes->size())-1);
+
+                while (n < att_points->size()) {
+                    if (overlap_point(att_points->at(n), 0.0f, novo, Dk, node_point_distance)) {
+                        att_points->erase(att_points->begin()+n);
+                        n--;
+                    }
+                    n++;
+                }
+                n = 0;
+            }
+        }
+    }
+}
 
 material* make_material(const std::string& name, const vec3f& kd,
                         const std::string& kd_txt, const vec3f& ks = {0.04f, 0.04f, 0.04f},
@@ -77,8 +202,6 @@ void refine_branch_fork(int c, vec3f node, float r, material* mat, shape_group* 
     compute_normals(shp);
     shp->mat = mat;
 }
-
-
 
 float build_branch_rec(float n, int c, float r, vector<vec3f>* nodes, vector<vector<int>>* children,
                         vector<int>* parent, vector<vec3f>* norm, material* mat, shape_group* shp_group) {
@@ -139,58 +262,6 @@ void build_branches(float n, int c, float r, vector<vec3f>* nodes,
     build_branch_rec(n, c, r, nodes, children, parent, norm, mat, shp_group);
 }
 
-void generate_nodes(float Di, float D, float Dk, vector<vec3f>* att_points, vector<vec3f>* nodes, vector<vector<int>>* children,
-                    vector<int>* parents, vector<vec3f>* nodes_norms) {
-    float min_dist;
-    auto flag = true;
-    float node_point_distance = -1.0f;
-
-    while (flag) {
-        flag = false;
-        min_dist = -1.0f;
-        int closest [att_points->size()] = {0};
-        vec3f new_nodes [nodes->size()];
-
-        for (auto i = 0; i < att_points->size(); i++) {
-            for (auto j = 0; j < nodes->size(); j++) {
-                if (overlap_point(att_points->at(i), Di, nodes->at(j), 0.0f, node_point_distance)) {
-                    if (min_dist < 0 or node_point_distance < min_dist) {
-                        closest[i] = j+1;
-                        min_dist = node_point_distance;
-                    }
-                }
-            }
-            if (closest[i] > 0) {
-                new_nodes[closest[i]-1] += normalize(att_points->at(i) - nodes->at(closest[i]-1));
-            }
-        }
-
-        auto len_nodes_old = nodes->size();
-        int n = 0;
-        for (auto i = 0; i< len_nodes_old; i++) {
-            auto novo = nodes->at(i) + D*normalize(new_nodes[i]);
-            if (new_nodes[i] != vec3f{0.0f, 0.0f, 0.0f} and find(nodes->begin(), nodes->end(), novo) == nodes->end()) {
-                flag = true;
-                parents->push_back(i);
-                vector<int> row;
-                children->push_back(row);
-                nodes->push_back(novo);
-                nodes_norms->push_back(normalize(new_nodes[i]));
-                children->at(i).push_back(int(nodes->size())-1);
-
-                while (n < att_points->size()) {
-                    if (overlap_point(att_points->at(n), 0.0f, novo, Dk, node_point_distance)) {
-                        att_points->erase(att_points->begin()+n);
-                        n--;
-                    }
-                    n++;
-                }
-                n = 0;
-            }
-        }
-    }
-}
-
 void add_base_node(vec3f node, vec3f norm, vector<vec3f>* nodes, vector<vector<int>>* children,
         vector<int>* parents, vector<vec3f>* nodes_norms, vector<int>* base_nodes, int parent, int child, bool is_base) {
     nodes->push_back(node);
@@ -210,9 +281,9 @@ int main(int argc, char * argv []) {
     auto parser = make_parser(argc, argv, "trees-generator", "create tree");
     auto env = parse_opt<string>(parser, "--envelope", "-e", "filename of the envelope", "empty", true);
     auto N = parse_opt<int>(parser, "--points", "-p", "number of attraction points", 1000);
-    auto D = parse_opt<float>(parser, "--distance", "-d", "distance between adjacent nodes", 0.06f, true);
+    auto D = parse_opt<float>(parser, "--distance", "-d", "distance between adjacent nodes", 0.05f, true);
     auto Di = parse_opt<float>(parser, "--influence", "-i", "radius of influence", 7.0f, true)*D;
-    auto Dk = parse_opt<float>(parser, "--kill", "-k", "kill distance", 4.0f, true)*D;
+    auto Dk = parse_opt<float>(parser, "--kill", "-k", "kill distance", 2.0f, true)*D;
     auto output = parse_opt<string>(parser, "--output", "-o", "output filename", "out.obj", true);
 
     auto opts_in = new load_options;
@@ -247,7 +318,6 @@ int main(int argc, char * argv []) {
     scn_out->materials.push_back(bark);
 
     for (auto i : *base_nodes) {
-        printf("%d\n", i);
         auto shp_group = new shape_group;
         build_branches(n, i, r, nodes, children, parents, nodes_norms, bark, shp_group);
         auto* inst = new instance;
