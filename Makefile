@@ -38,40 +38,26 @@ edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
 	/home/meraxes/clion/bin/cmake/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
-
-# Special rule for the target edit_cache
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
-
-# The main all target
 all: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/meraxes/trees-generator/CMakeFiles /home/meraxes/trees-generator/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/meraxes/trees-generator/CMakeFiles 0
 .PHONY : all
-
-# The main clean target
 clean:
 	$(MAKE) -f CMakeFiles/Makefile2 clean
 .PHONY : clean
-
-# The main clean target
 clean/fast: clean
 
 .PHONY : clean/fast
-
-# Prepare targets for installation.
 preinstall: all
 	$(MAKE) -f CMakeFiles/Makefile2 preinstall
 .PHONY : preinstall
-
-# Prepare targets for installation.
 preinstall/fast:
 	$(MAKE) -f CMakeFiles/Makefile2 preinstall
 .PHONY : preinstall/fast
-
-# clear depends
 depend:
 	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
@@ -79,8 +65,6 @@ depend:
 tree_generator: cmake_check_build_system
 	$(MAKE) -f CMakeFiles/Makefile2 tree_generator
 .PHONY : tree_generator
-
-# fast build rule for target.
 tree_generator/fast:
 	$(MAKE) -f CMakeFiles/tree_generator.dir/build.make CMakeFiles/tree_generator.dir/build
 .PHONY : tree_generator/fast
@@ -88,8 +72,6 @@ tree_generator/fast:
 yocto_gl: cmake_check_build_system
 	$(MAKE) -f CMakeFiles/Makefile2 yocto_gl
 .PHONY : yocto_gl
-
-# fast build rule for target.
 yocto_gl/fast:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/build
 .PHONY : yocto_gl/fast
@@ -97,8 +79,6 @@ yocto_gl/fast:
 tree_generator.o: tree_generator.cpp.o
 
 .PHONY : tree_generator.o
-
-# target to build an object file
 tree_generator.cpp.o:
 	$(MAKE) -f CMakeFiles/tree_generator.dir/build.make CMakeFiles/tree_generator.dir/tree_generator.cpp.o
 .PHONY : tree_generator.cpp.o
@@ -124,8 +104,6 @@ tree_generator.cpp.s:
 yocto-gl/yocto/ext/imgui/imgui.o: yocto-gl/yocto/ext/imgui/imgui.cpp.o
 
 .PHONY : yocto-gl/yocto/ext/imgui/imgui.o
-
-# target to build an object file
 yocto-gl/yocto/ext/imgui/imgui.cpp.o:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/imgui/imgui.cpp.o
 .PHONY : yocto-gl/yocto/ext/imgui/imgui.cpp.o
@@ -134,7 +112,6 @@ yocto-gl/yocto/ext/imgui/imgui.i: yocto-gl/yocto/ext/imgui/imgui.cpp.i
 
 .PHONY : yocto-gl/yocto/ext/imgui/imgui.i
 
-# target to preprocess a source file
 yocto-gl/yocto/ext/imgui/imgui.cpp.i:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/imgui/imgui.cpp.i
 .PHONY : yocto-gl/yocto/ext/imgui/imgui.cpp.i
@@ -143,7 +120,6 @@ yocto-gl/yocto/ext/imgui/imgui.s: yocto-gl/yocto/ext/imgui/imgui.cpp.s
 
 .PHONY : yocto-gl/yocto/ext/imgui/imgui.s
 
-# target to generate assembly for a file
 yocto-gl/yocto/ext/imgui/imgui.cpp.s:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/imgui/imgui.cpp.s
 .PHONY : yocto-gl/yocto/ext/imgui/imgui.cpp.s
