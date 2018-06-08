@@ -248,7 +248,6 @@ yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.o: yocto-gl/yocto/ext/imgui/imgui_i
 
 .PHONY : yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.o
 
-# target to build an object file
 yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.cpp.o:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.cpp.o
 .PHONY : yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.cpp.o
@@ -257,7 +256,6 @@ yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.i: yocto-gl/yocto/ext/imgui/imgui_i
 
 .PHONY : yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.i
 
-# target to preprocess a source file
 yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.cpp.i:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.cpp.i
 .PHONY : yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.cpp.i
@@ -266,7 +264,6 @@ yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.s: yocto-gl/yocto/ext/imgui/imgui_i
 
 .PHONY : yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.s
 
-# target to generate assembly for a file
 yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.cpp.s:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.cpp.s
 .PHONY : yocto-gl/yocto/ext/imgui/imgui_impl_glfw_gl3.cpp.s
@@ -275,7 +272,6 @@ yocto-gl/yocto/ext/nanosvg.o: yocto-gl/yocto/ext/nanosvg.cpp.o
 
 .PHONY : yocto-gl/yocto/ext/nanosvg.o
 
-# target to build an object file
 yocto-gl/yocto/ext/nanosvg.cpp.o:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/nanosvg.cpp.o
 .PHONY : yocto-gl/yocto/ext/nanosvg.cpp.o
@@ -293,7 +289,6 @@ yocto-gl/yocto/ext/nanosvg.s: yocto-gl/yocto/ext/nanosvg.cpp.s
 
 .PHONY : yocto-gl/yocto/ext/nanosvg.s
 
-# target to generate assembly for a file
 yocto-gl/yocto/ext/nanosvg.cpp.s:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/nanosvg.cpp.s
 .PHONY : yocto-gl/yocto/ext/nanosvg.cpp.s
@@ -302,7 +297,6 @@ yocto-gl/yocto/ext/stb_image.o: yocto-gl/yocto/ext/stb_image.cpp.o
 
 .PHONY : yocto-gl/yocto/ext/stb_image.o
 
-# target to build an object file
 yocto-gl/yocto/ext/stb_image.cpp.o:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/stb_image.cpp.o
 .PHONY : yocto-gl/yocto/ext/stb_image.cpp.o
@@ -311,7 +305,6 @@ yocto-gl/yocto/ext/stb_image.i: yocto-gl/yocto/ext/stb_image.cpp.i
 
 .PHONY : yocto-gl/yocto/ext/stb_image.i
 
-# target to preprocess a source file
 yocto-gl/yocto/ext/stb_image.cpp.i:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/stb_image.cpp.i
 .PHONY : yocto-gl/yocto/ext/stb_image.cpp.i
@@ -320,7 +313,6 @@ yocto-gl/yocto/ext/stb_image.s: yocto-gl/yocto/ext/stb_image.cpp.s
 
 .PHONY : yocto-gl/yocto/ext/stb_image.s
 
-# target to generate assembly for a file
 yocto-gl/yocto/ext/stb_image.cpp.s:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/ext/stb_image.cpp.s
 .PHONY : yocto-gl/yocto/ext/stb_image.cpp.s
@@ -329,7 +321,6 @@ yocto-gl/yocto/yocto_gl.o: yocto-gl/yocto/yocto_gl.cpp.o
 
 .PHONY : yocto-gl/yocto/yocto_gl.o
 
-# target to build an object file
 yocto-gl/yocto/yocto_gl.cpp.o:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/yocto_gl.cpp.o
 .PHONY : yocto-gl/yocto/yocto_gl.cpp.o
@@ -338,7 +329,6 @@ yocto-gl/yocto/yocto_gl.i: yocto-gl/yocto/yocto_gl.cpp.i
 
 .PHONY : yocto-gl/yocto/yocto_gl.i
 
-# target to preprocess a source file
 yocto-gl/yocto/yocto_gl.cpp.i:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/yocto_gl.cpp.i
 .PHONY : yocto-gl/yocto/yocto_gl.cpp.i
@@ -347,12 +337,10 @@ yocto-gl/yocto/yocto_gl.s: yocto-gl/yocto/yocto_gl.cpp.s
 
 .PHONY : yocto-gl/yocto/yocto_gl.s
 
-# target to generate assembly for a file
 yocto-gl/yocto/yocto_gl.cpp.s:
 	$(MAKE) -f CMakeFiles/yocto_gl.dir/build.make CMakeFiles/yocto_gl.dir/yocto-gl/yocto/yocto_gl.cpp.s
 .PHONY : yocto-gl/yocto/yocto_gl.cpp.s
 
-# Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
@@ -388,14 +376,6 @@ help:
 	@echo "... yocto-gl/yocto/yocto_gl.s"
 .PHONY : help
 
-
-
-#=============================================================================
-# Special targets to cleanup operation of make.
-
-# Special rule to run CMake to check the build system integrity.
-# No rule that depends on this can have commands that come from listfiles
-# because they might be regenerated.
 cmake_check_build_system:
 	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
