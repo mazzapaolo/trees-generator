@@ -1,3 +1,6 @@
 - Attraction points distribution on the lines between the points of the envelope and its center
 - leaves distribution on the nodes of the tree, reducing the distance between adjacent nodes
 - given an envelope, generate a sequence of base nodes to create the tree's trunk
+- pick a random point inside a sphere stackoverflow
+- voxelization
+- sylvain - 
