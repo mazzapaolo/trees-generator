@@ -296,6 +296,7 @@ void build_branches(float n, int c, float r, vector<vec3f>* nodes,
     build_branch(n, c, r, nodes, children, parent, norm, mat, shp_group);
 }
 
+
 int main(int argc, char * argv []) {
     auto parser = make_parser(argc, argv, "trees-generator", "create tree");
     auto env = parse_opt<string>(parser, "--envelope", "-e", "filename of the envelope", "empty", true);
@@ -313,6 +314,7 @@ int main(int argc, char * argv []) {
     for(auto* env_shp : envelope->shapes) {
         generate_attraction_points(N, env_shp->shapes[0]->pos, att_points);
     }
+
 
     auto nodes = new vector<vec3f>();
     auto nodes_norms = new vector<vec3f>();
@@ -349,7 +351,5 @@ int main(int argc, char * argv []) {
 
     auto opts_out = new save_options;
     save_scene(output, scn_out, *opts_out);
-    //delete scn_out;
-
     return 0;
 }
